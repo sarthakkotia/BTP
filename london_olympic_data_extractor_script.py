@@ -44,9 +44,7 @@ def extract_number_grayscale(roi):
     # Get the text from the thresholded image using Tesseract OCR
     text = pytesseract.image_to_string(threshold, lang='digits')
     return text
-def extract_score_frame(img,template):
-    cropped=img[775:973,350:1606]
-    return img
+
 def extract_frame(img_rgb,template):
     
     desired_width = 1625
@@ -264,9 +262,6 @@ def save_data(row,fileName):
     # Save the updated DataFrame to the CSV file
     df.to_csv(fileName+'.csv', index=False)
 
-    
-
-# %%
 def correct_score(score):
     pattern = r'(\d+) (\d+(\.\d+)?)?'
 
@@ -278,6 +273,19 @@ def correct_score(score):
     else:
         return score
 
+def extract_score_frame(img,template):
+    cropped_frame=img[775:973,350:1606]
+    cropped_frame = cv2.cvtColor(cropped_frame,cv2.COLOR_RGB2GRAY)
+    w, h = template.shape[::-1]
+    res = cv2.matchTemplate(cropped_frame,template,cv2.TM_CCOEFF_NORMED)
+    threshold = 0.5  # You can adjust this threshold according to your needs
+    loc = np.where(res >= threshold) 
+    if len(loc[0]) > 0:
+        cv2.imshow("f",cropped_frame)
+        cv2.waitKey(0)
+        return True
+    else:
+        return False
 # %%
 def extract_from_video(filePath,videoName,template,templateRes):
         # Open the video using OpenCV
@@ -333,11 +341,12 @@ def extract_from_video(filePath,videoName,template,templateRes):
         seconds = total_seconds % 60
         timeInVideo =f"{minutes} minutes and {seconds} seconds"
 
-        extract_score_frame(frame,template)
-        cropped=frame[775:973,350:1606]
-        
-        cv2.imshow("cropped",cropped)
-        cv2.waitKey(0)
+        if (extract_score_frame(frame,template)):
+            #do OCR
+            print("OCR")
+            cv2.imshow("f",frame)
+            cv2.waitKey(0)
+        '''
         # Convert the frame to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Use OCR to extract the text from the frame
@@ -386,7 +395,7 @@ def extract_from_video(filePath,videoName,template,templateRes):
             print(row)
             save_data(row,"scores")
 
-        
+        '''
 
         currentFrameInSec=0    
     cap.release()
