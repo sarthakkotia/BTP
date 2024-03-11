@@ -394,7 +394,7 @@ def extract_from_video(filePath,videoName,template,templateRes):
 # %%
 templateLondon = cv2.imread('HelperImages/template_london_2.png', cv2.IMREAD_GRAYSCALE)
 templateResLondon = cv2.imread('HelperImages/template_res_london_2.png', cv2.IMREAD_GRAYSCALE)
-
+print("kotia")
 extract_from_video("DownloadedVideos/Diving - Mens 3m Springboard - Final  London 2012 Olympic Games.mp4","Mens_3m_Springboard_-_Final_London_2012",templateLondon,templateResLondon)
 
 
