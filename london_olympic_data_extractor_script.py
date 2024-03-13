@@ -286,6 +286,13 @@ def extract_score_frame(img,template):
         return True
     else:
         return False
+def text_extract(frame):
+    gray = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)
+    text = pytesseract.image_to_string(gray,lang="eng")   
+    words = text.lower().split()  # split the text into a list of words
+    return words
+    
+
 # %%
 def extract_from_video(filePath,videoName,template,templateRes):
         # Open the video using OpenCV
@@ -342,10 +349,11 @@ def extract_from_video(filePath,videoName,template,templateRes):
         timeInVideo =f"{minutes} minutes and {seconds} seconds"
 
         if (extract_score_frame(frame,template)):
-            #do OCR
-            print("OCR")
             cv2.imshow("f",frame)
             cv2.waitKey(0)
+            #if template matched then perform OCR
+            text_extract(frame)
+
         '''
         # Convert the frame to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
