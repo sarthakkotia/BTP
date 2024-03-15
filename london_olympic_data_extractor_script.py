@@ -286,11 +286,11 @@ def extract_score_frame(img,template):
         return True
     else:
         return False
-def text_extract(frame):
-    gray = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)
-    text = pytesseract.image_to_string(gray,lang="eng")   
-    words = text.lower().split()  # split the text into a list of words
-    return words
+# def text_extract(frame):
+#     gray = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)
+#     text = pytesseract.image_to_string(gray,lang="eng")   
+#     words = text.lower().split()  # split the text into a list of words
+#     return words
     
 
 # %%
@@ -348,13 +348,12 @@ def extract_from_video(filePath,videoName,template,templateRes):
         seconds = total_seconds % 60
         timeInVideo =f"{minutes} minutes and {seconds} seconds"
 
-        if (extract_score_frame(frame,template)):
-            cv2.imshow("f",frame)
-            cv2.waitKey(0)
-            #if template matched then perform OCR
-            text_extract(frame)
+        # if (extract_score_frame(frame,template)):
+        #     cv2.imshow("f",frame)
+        #     cv2.waitKey(0)
+        #     #if template matched then perform OCR
+        #     text_extract(frame)
 
-        '''
         # Convert the frame to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Use OCR to extract the text from the frame
@@ -373,12 +372,12 @@ def extract_from_video(filePath,videoName,template,templateRes):
         somersaults=""
         diveGroup=""
         twists=""
-    
-        
         if not diveStarted and "difficulty" in text.lower() and "penalty" not in text.lower() and "position" in text.lower():
             diveStarted=True
             cropped=extract_frame(frame,template)
             plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
+            cv2.imshow("abc",frame)
+            cv2.waitKey(0)
             round,country,name,difficulty,divePosition,somersaults,diveGroup,twists = extract_diveinfo(cropped)
             row = {'Sno':sno,'Match name':videoName,"Time":total_seconds,'Name':name.strip(),'Country':country.strip(),'Difficulty':difficulty,'Dive Position':divePosition,'Somersaults':somersaults,
         'Dive Group':diveGroup,
@@ -403,15 +402,14 @@ def extract_from_video(filePath,videoName,template,templateRes):
             print(row)
             save_data(row,"scores")
 
-        '''
 
-        currentFrameInSec=0    
+    currentFrameInSec=0    
     cap.release()
 
 # %%
 templateLondon = cv2.imread('HelperImages/template_london_2.png', cv2.IMREAD_GRAYSCALE)
 templateResLondon = cv2.imread('HelperImages/template_res_london_2.png', cv2.IMREAD_GRAYSCALE)
 print("kotia")
-extract_from_video("DownloadedVideos/Diving - Mens 3m Springboard - Final  London 2012 Olympic Games.mp4","Mens_3m_Springboard_-_Final_London_2012",templateLondon,templateResLondon)
+extract_from_video("DownloadedVideos\Diving - Mens 3m Springboard - Final  London 2012 Olympic Games.mp4","Mens_3m_Springboard_-_Final_London_2012",templateLondon,templateResLondon)
 
 
