@@ -401,7 +401,6 @@ def extract_from_video(filePath,videoName,template,templateRes):
             #if template matched then perform OCR
             extract_info(frame)
 
-        '''
         # Convert the frame to grayscale
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Use OCR to extract the text from the frame
@@ -420,12 +419,12 @@ def extract_from_video(filePath,videoName,template,templateRes):
         somersaults=""
         diveGroup=""
         twists=""
-    
-        
         if not diveStarted and "difficulty" in text.lower() and "penalty" not in text.lower() and "position" in text.lower():
             diveStarted=True
             cropped=extract_frame(frame,template)
             plt.imshow(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
+            cv2.imshow("abc",frame)
+            cv2.waitKey(0)
             round,country,name,difficulty,divePosition,somersaults,diveGroup,twists = extract_diveinfo(cropped)
             row = {'Sno':sno,'Match name':videoName,"Time":total_seconds,'Name':name.strip(),'Country':country.strip(),'Difficulty':difficulty,'Dive Position':divePosition,'Somersaults':somersaults,
         'Dive Group':diveGroup,
@@ -450,9 +449,8 @@ def extract_from_video(filePath,videoName,template,templateRes):
             print(row)
             save_data(row,"scores")
 
-        '''
 
-        currentFrameInSec=0    
+    currentFrameInSec=0    
     cap.release()
 
 # %%
