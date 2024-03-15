@@ -280,34 +280,83 @@ def extract_score_frame(img,template):
     res = cv2.matchTemplate(cropped_frame,template,cv2.TM_CCOEFF_NORMED)
     threshold = 0.5  # You can adjust this threshold according to your needs
     loc = np.where(res >= threshold) 
+    # applying template matching anf if it matches then length is > 0 
     if len(loc[0]) > 0:
         cv2.imshow("f",cropped_frame)
         cv2.waitKey(0)
         return True
     else:
         return False
-def text_extract(frame):
-    gray = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)
-    text = pytesseract.image_to_string(gray,lang="eng")   
-    words = text.lower().split()  # split the text into a list of words
-    return words
+def get_diver_name(frame):
+    cropped_name=frame[4:73,280:1100]
+    text = pytesseract.image_to_string(cropped_name,lang="eng")
+    print(text)
+    return text
+
+def get_diver_country(frame):
+    cropped_country=frame[7:75,30:262]
+    text = pytesseract.image_to_string(cropped_country,lang="eng")
+    print(text)
+    return text
+
+def get_diver_position(frame):
+    cropped_position=frame[85:131,960:1210]
+    text = pytesseract.image_to_string(cropped_position,lang="eng")
+    print(text)
+    return text
+
+def get_diver_difficulty(frame):
+    cropped_difficulty=frame[83:131,463:775]
+    text = pytesseract.image_to_string(cropped_difficulty,lang="eng")
+    print(text)
+    return text
+
+def get_diver_group(frame):
+    cropped_divegroup=frame[140:190,13:180]
+    text = pytesseract.image_to_string(cropped_divegroup,lang="eng")
+    print(text)
+    return text
+
+def get_diver_somersaults(frame):
+    cropped_somersault=frame[140:190,180:466]
+    text = pytesseract.image_to_string(cropped_somersault,lang="eng")
+    print(text)
+    return text
+
+def get_diver_twists(frame):
+    cropped_twists=frame[140:190,444:630]
+    text = pytesseract.image_to_string(cropped_twists,lang="eng")
+    print(text)
+    return text
+
+def extract_info(frame):
+    cropped_frame=frame[775:973,350:1606]
+    cropped_frame=cv2.cvtColor(cropped_frame,cv2.COLOR_RGB2GRAY)
+    threshold_img = cv2.threshold(cropped_frame, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    cv2.imshow("F",threshold_img)
+    cv2.waitKey(0)
+    name = get_diver_name(cropped_frame)
+    name = name.replace("\n", "") 
+    country = get_diver_country(cropped_frame)
+    country = country.replace("\n","")
+    position = get_diver_position(cropped_frame)
+    position = position.replace("\n","") 
+    difficulty = get_diver_difficulty(cropped_frame)
+    difficulty=difficulty.replace("\n","") 
+    group = get_diver_group(cropped_frame)
+    group=group.replace("\n","")
+    somersaults = get_diver_somersaults(cropped_frame) 
+    somersaults = somersaults.replace("\n","")
+    twists = get_diver_twists(cropped_frame)
+    twists = twists.replace("\n","") 
     
 
 # %%
 def extract_from_video(filePath,videoName,template,templateRes):
-        # Open the video using OpenCV
-    
     # desired_width = 1631
     # desired_height = 907
     cap = cv2.VideoCapture(filePath)
-    #,apiPreference=cv2.CAP_ANY,params=[
-    #cv2.CAP_PROP_FRAME_WIDTH,desired_width ,
-    #cv2.CAP_PROP_FRAME_HEIGHT, desired_height])
-    
-    #pcap.set(cv2.CAP_PROP_FRAME_WIDTH, desired_width)
-    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, desired_height)
     fps=cap.get(cv2.CAP_PROP_FPS)
-    # print(fps)
     minToSkip=4
     framesToSkip=fps*60*minToSkip
     framesToSkipEverySec=fps-1
@@ -320,11 +369,10 @@ def extract_from_video(filePath,videoName,template,templateRes):
     # Initialize a list to store the scores
 
     print("start")
-
-    # oldText="old"
     # Process each frame of the video
+    cap.set(cv2.CAP_PROP_POS_FRAMES,13*60*25)
     while True:
-        # Read the next frame
+        # Read the next frame 
         ret, frame = cap.read()
         currentFrame+=1
         currentFrameInSec+=1
@@ -336,7 +384,6 @@ def extract_from_video(filePath,videoName,template,templateRes):
             continue
         if currentFrameInSec<framesToSkipEverySec:
             continue
-        
         # Break the loop if the video has ended
         if not ret:
             print("completed")
@@ -349,10 +396,10 @@ def extract_from_video(filePath,videoName,template,templateRes):
         timeInVideo =f"{minutes} minutes and {seconds} seconds"
 
         if (extract_score_frame(frame,template)):
-            cv2.imshow("f",frame)
-            cv2.waitKey(0)
+            diveStarted=True
+            print(timeInVideo)
             #if template matched then perform OCR
-            text_extract(frame)
+            extract_info(frame)
 
         '''
         # Convert the frame to grayscale
@@ -411,7 +458,6 @@ def extract_from_video(filePath,videoName,template,templateRes):
 # %%
 templateLondon = cv2.imread('HelperImages/template_london_2.png', cv2.IMREAD_GRAYSCALE)
 templateResLondon = cv2.imread('HelperImages/template_res_london_2.png', cv2.IMREAD_GRAYSCALE)
-print("kotia")
 extract_from_video("DownloadedVideos/Diving - Mens 3m Springboard - Final  London 2012 Olympic Games.mp4","Mens_3m_Springboard_-_Final_London_2012",templateLondon,templateResLondon)
 
 
